@@ -103,7 +103,6 @@ RDEPEND="${COMMON_DEPEND}
 	x11-apps/xrdb
 	x11-apps/xset
 	x11-apps/xsetroot
-
 	!systemd? ( sys-apps/dbus )
 	!dev-libs/xembed-sni-proxy
 	!kde-plasma/freespacenotifier:4
