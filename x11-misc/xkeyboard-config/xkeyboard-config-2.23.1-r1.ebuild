@@ -24,11 +24,9 @@ DEPEND="
 	sys-devel/gettext
 	dev-util/intltool"
 
-
 PATCHES=(
-    "${FILESDIR}"/${P}-ru-yawerty.patch
+	"${FILESDIR}"/${P}-ru-yawerty.patch
 )
-
 
 XORG_CONFIGURE_OPTIONS=(
 	--with-xkb-base="${EPREFIX}/usr/share/X11/xkb"
