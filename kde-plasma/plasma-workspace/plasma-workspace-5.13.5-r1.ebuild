@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -77,18 +77,21 @@ COMMON_DEPEND="
 	x11-libs/xcb-util
 	x11-libs/xcb-util-image
 	appstream? ( dev-libs/appstream[qt5] )
-	calendar? ( || ( $(add_frameworks_dep kholidays) $(add_kdeapps_dep kholidays) ) )
+	calendar? ( $(add_frameworks_dep kholidays) )
 	geolocation? ( $(add_frameworks_dep networkmanager-qt) )
 	gps? ( sci-geosciences/gpsd )
 	prison? ( $(add_frameworks_dep prison) )
 	qalculate? ( sci-libs/libqalculate:= )
 	semantic-desktop? ( $(add_frameworks_dep baloo) )
 "
+DEPEND="${COMMON_DEPEND}
+	$(add_qt_dep qtconcurrent)
+	x11-base/xorg-proto
+"
 RDEPEND="${COMMON_DEPEND}
 	$(add_frameworks_dep kded)
 	$(add_frameworks_dep kdesu)
 	$(add_kdeapps_dep kio-extras)
-	$(add_plasma_dep kde-cli-tools)
 	$(add_plasma_dep ksysguard)
 	$(add_plasma_dep milou)
 	$(add_plasma_dep plasma-integration)
@@ -115,17 +118,15 @@ RDEPEND="${COMMON_DEPEND}
 	!kde-plasma/ksplash:4
 	!kde-plasma/plasma-workspace:4
 "
-DEPEND="${COMMON_DEPEND}
-	$(add_qt_dep qtconcurrent)
-	x11-proto/xproto
+PDEPEND="
+	$(add_plasma_dep kde-cli-tools)
 "
 
 PATCHES=(
 	"${FILESDIR}/${PN}-5.4-startkde-script.patch"
 	"${FILESDIR}/${PN}-5.10-startplasmacompositor-script.patch"
-	"${FILESDIR}/${PN}-5.10.4-unused-dep.patch"
-	"${FILESDIR}/${P}-CVE-2018-6790.patch"
-	"${FILESDIR}/${P}-CVE-2018-6791.patch"
+	"${FILESDIR}/${PN}-5.12.80-tests-optional.patch"
+	"${FILESDIR}/${P}-double-positions.patch"
 )
 
 RESTRICT+=" test"
@@ -166,9 +167,7 @@ src_install() {
 pkg_postinst () {
 	kde5_pkg_postinst
 
-	echo
 	elog "To enable gpg-agent and/or ssh-agent in Plasma sessions,"
 	elog "edit ${EPREFIX}/etc/plasma/startup/10-agent-startup.sh and"
 	elog "${EPREFIX}/etc/plasma/shutdown/10-agent-shutdown.sh"
-	echo
 }
