@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2018 Gentoo Authors /
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -13,6 +13,7 @@ KEYWORDS="amd64 ~arm ~arm64 x86"
 IUSE="appstream +calendar geolocation gps prison qalculate +semantic-desktop systemd"
 
 REQUIRED_USE="gps? ( geolocation )"
+
 
 COMMON_DEPEND="
 	$(add_frameworks_dep kactivities)
