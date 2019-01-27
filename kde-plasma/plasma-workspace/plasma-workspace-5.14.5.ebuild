@@ -1,6 +1,5 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# Just update date
 
 EAPI=6
 
@@ -56,11 +55,11 @@ COMMON_DEPEND="
 	$(add_plasma_dep kscreenlocker)
 	$(add_plasma_dep kwin)
 	$(add_plasma_dep libksysguard)
+	$(add_plasma_dep libkworkspace)
 	$(add_qt_dep qtdbus)
 	$(add_qt_dep qtdeclarative 'widgets')
 	$(add_qt_dep qtgui 'jpeg')
 	$(add_qt_dep qtnetwork)
-	$(add_qt_dep qtscript)
 	$(add_qt_dep qtsql)
 	$(add_qt_dep qtwidgets)
 	$(add_qt_dep qtx11extras)
@@ -85,11 +84,14 @@ COMMON_DEPEND="
 	qalculate? ( sci-libs/libqalculate:= )
 	semantic-desktop? ( $(add_frameworks_dep baloo) )
 "
+DEPEND="${COMMON_DEPEND}
+	$(add_qt_dep qtconcurrent)
+	x11-base/xorg-proto
+"
 RDEPEND="${COMMON_DEPEND}
 	$(add_frameworks_dep kded)
 	$(add_frameworks_dep kdesu)
 	$(add_kdeapps_dep kio-extras)
-	$(add_plasma_dep kde-cli-tools)
 	$(add_plasma_dep ksysguard)
 	$(add_plasma_dep milou)
 	$(add_plasma_dep plasma-integration)
@@ -105,7 +107,6 @@ RDEPEND="${COMMON_DEPEND}
 	x11-apps/xset
 	x11-apps/xsetroot
 	!systemd? ( sys-apps/dbus )
-	!dev-libs/xembed-sni-proxy
 	!kde-plasma/freespacenotifier:4
 	!kde-plasma/libtaskmanager:4
 	!kde-plasma/kcminit:4
@@ -116,15 +117,15 @@ RDEPEND="${COMMON_DEPEND}
 	!kde-plasma/ksplash:4
 	!kde-plasma/plasma-workspace:4
 "
-DEPEND="${COMMON_DEPEND}
-	$(add_qt_dep qtconcurrent)
-	x11-base/xorg-proto
+PDEPEND="
+	$(add_plasma_dep kde-cli-tools)
 "
 
 PATCHES=(
 	"${FILESDIR}/${PN}-5.4-startkde-script.patch"
 	"${FILESDIR}/${PN}-5.10-startplasmacompositor-script.patch"
-	"${FILESDIR}/${PN}-5.10.4-unused-dep.patch"
+	"${FILESDIR}/${PN}-5.12.80-tests-optional.patch"
+	"${FILESDIR}/${PN}-5.14.2-split-libkworkspace.patch"
 )
 
 RESTRICT+=" test"
@@ -134,10 +135,17 @@ src_prepare() {
 
 	sed -e "s|\`qtpaths|\`$(qt5_get_bindir)/qtpaths|" \
 		-i startkde/startkde.cmake startkde/startplasmacompositor.cmake || die
+
+	cmake_comment_add_subdirectory libkworkspace
+	# delete colliding libkworkspace translations
+	if [[ ${KDE_BUILD_TYPE} = release ]]; then
+		find po -type f -name "*po" -and -name "libkworkspace*" -delete || die
+	fi
 }
 
 src_configure() {
 	local mycmakeargs=(
+		-DBUILD_xembed-sni-proxy=OFF
 		$(cmake-utils_use_find_package appstream AppStreamQt)
 		$(cmake-utils_use_find_package calendar KF5Holidays)
 		$(cmake-utils_use_find_package geolocation KF5NetworkManagerQt)
