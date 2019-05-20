@@ -106,7 +106,6 @@ RDEPEND="${COMMON_DEPEND}
 	x11-apps/xprop
 	x11-apps/xrdb
 	x11-apps/xsetroot
-	systemd? ( sys-apps/dbus[user-session] )
 	!systemd? ( sys-apps/dbus )
 	!<kde-plasma/plasma-desktop-5.14.80:5
 "
