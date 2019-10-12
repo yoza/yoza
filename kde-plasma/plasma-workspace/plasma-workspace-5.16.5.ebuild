@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 KDE_HANDBOOK="forceoptional"
 KDE_TEST="forceoptional"
@@ -9,8 +9,8 @@ VIRTUALX_REQUIRED="test"
 inherit kde5 qmake-utils
 
 DESCRIPTION="KDE Plasma workspace"
-KEYWORDS="amd64 ~arm ~arm64 x86"
-IUSE="appstream +calendar geolocation gps prison qalculate +semantic-desktop systemd"
+KEYWORDS="amd64 ~arm arm64 x86"
+IUSE="appstream +calendar geolocation gps qalculate qrcode +semantic-desktop systemd"
 
 REQUIRED_USE="gps? ( geolocation )"
 
@@ -25,6 +25,7 @@ COMMON_DEPEND="
 	$(add_frameworks_dep kcrash)
 	$(add_frameworks_dep kdbusaddons)
 	$(add_frameworks_dep kdeclarative)
+	$(add_frameworks_dep kded)
 	$(add_frameworks_dep kdelibs4support)
 	$(add_frameworks_dep kglobalaccel)
 	$(add_frameworks_dep kguiaddons)
@@ -35,8 +36,6 @@ COMMON_DEPEND="
 	$(add_frameworks_dep kitemmodels)
 	$(add_frameworks_dep kitemviews)
 	$(add_frameworks_dep kjobwidgets)
-	$(add_frameworks_dep kjs)
-	$(add_frameworks_dep kjsembed)
 	$(add_frameworks_dep knewstuff)
 	$(add_frameworks_dep knotifications)
 	$(add_frameworks_dep knotifyconfig)
@@ -80,8 +79,8 @@ COMMON_DEPEND="
 	calendar? ( $(add_frameworks_dep kholidays) )
 	geolocation? ( $(add_frameworks_dep networkmanager-qt) )
 	gps? ( sci-geosciences/gpsd )
-	prison? ( $(add_frameworks_dep prison) )
 	qalculate? ( sci-libs/libqalculate:= )
+	qrcode? ( $(add_frameworks_dep prison) )
 	semantic-desktop? ( $(add_frameworks_dep baloo) )
 "
 DEPEND="${COMMON_DEPEND}
@@ -89,8 +88,8 @@ DEPEND="${COMMON_DEPEND}
 	x11-base/xorg-proto
 "
 RDEPEND="${COMMON_DEPEND}
-	$(add_frameworks_dep kded)
 	$(add_frameworks_dep kdesu)
+	$(add_frameworks_dep kirigami)
 	$(add_kdeapps_dep kio-extras)
 	$(add_plasma_dep ksysguard)
 	$(add_plasma_dep milou)
@@ -99,42 +98,31 @@ RDEPEND="${COMMON_DEPEND}
 	$(add_qt_dep qtgraphicaleffects)
 	$(add_qt_dep qtpaths)
 	$(add_qt_dep qtquickcontrols 'widgets')
+	$(add_qt_dep qtquickcontrols2)
 	app-text/iso-codes
-	x11-apps/mkfontdir
 	x11-apps/xmessage
 	x11-apps/xprop
 	x11-apps/xrdb
-	x11-apps/xset
 	x11-apps/xsetroot
 	!systemd? ( sys-apps/dbus )
-	!kde-plasma/freespacenotifier:4
-	!kde-plasma/libtaskmanager:4
-	!kde-plasma/kcminit:4
-	!kde-plasma/kdebase-startkde:4
-	!kde-plasma/klipper:4
-	!kde-plasma/krunner:4
-	!kde-plasma/ksmserver:4
-	!kde-plasma/ksplash:4
-	!kde-plasma/plasma-workspace:4
+	!<kde-plasma/plasma-desktop-5.14.80:5
 "
 PDEPEND="
 	$(add_plasma_dep kde-cli-tools)
 "
 
 PATCHES=(
-	"${FILESDIR}/${PN}-5.4-startkde-script.patch"
+	"${FILESDIR}/${PN}-5.14.80-startkde-script.patch"
 	"${FILESDIR}/${PN}-5.10-startplasmacompositor-script.patch"
-	"${FILESDIR}/${PN}-5.12.80-tests-optional.patch"
 	"${FILESDIR}/${PN}-5.14.2-split-libkworkspace.patch"
+	"${FILESDIR}/${PN}-5.16.3-x11sessionrename.patch"
+	"${FILESDIR}/${PN}-5.16.4-no-share-dataengine.patch"
 )
 
 RESTRICT+=" test"
 
 src_prepare() {
 	kde5_src_prepare
-
-	sed -e "s|\`qtpaths|\`$(qt5_get_bindir)/qtpaths|" \
-		-i startkde/startkde.cmake startkde/startplasmacompositor.cmake || die
 
 	cmake_comment_add_subdirectory libkworkspace
 	# delete colliding libkworkspace translations
@@ -149,8 +137,8 @@ src_configure() {
 		$(cmake-utils_use_find_package appstream AppStreamQt)
 		$(cmake-utils_use_find_package calendar KF5Holidays)
 		$(cmake-utils_use_find_package geolocation KF5NetworkManagerQt)
-		$(cmake-utils_use_find_package prison KF5Prison)
 		$(cmake-utils_use_find_package qalculate Qalculate)
+		$(cmake-utils_use_find_package qrcode KF5Prison)
 		$(cmake-utils_use_find_package semantic-desktop KF5Baloo)
 	)
 
