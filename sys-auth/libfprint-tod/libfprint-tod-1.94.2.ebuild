@@ -35,7 +35,10 @@ BDEPEND="
 	introspection? ( dev-libs/gobject-introspection )
 "
 
-PATCHES=( ${FILESDIR}/${PN/-tod/}-0.8.2-fix-implicit-declaration.patch )
+PATCHES=(
+ 	"${FILESDIR}"/${PN/-tod/}-0.8.2-fix-implicit-declaration.patch
+ 	"${FILESDIR}"/${PN/-tod}-1.94.1-test-timeout.patch
+)
 
 S="${WORKDIR}/${PN/-tod/}-v${PV}+tod1"
 
